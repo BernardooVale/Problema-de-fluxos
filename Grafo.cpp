@@ -192,6 +192,7 @@ void Grafo::fordFulk(std::vector<Cabo*> caminho) {
 	}
 }
 
+/*
 void Grafo::bfs(Vertice* inicio, Vertice fim, std::vector<Cabo*>& conexPais) {
 
 	std::queue<Cabo*> fila; // fila de execucao
@@ -240,27 +241,37 @@ void Grafo::bfs(Vertice* inicio, Vertice fim, std::vector<Cabo*>& conexPais) {
 
 	return;
 }
+*/
+
+struct estagiosCaminho {
+	std::vector<Cabo*> conexHist;
+	Cabo* prox;
+};
 
 void Grafo::bfs(Vertice* inicio, Vertice fim, std::vector<Cabo*>& conexPais) {
 
-	std::queue<Cabo*> fila; // fila de execucao
+	std::queue<estagiosCaminho> fila; // fila de execucao
 	int numVertices = (int)this->vertices.size();
 	int idFinal = numVertices - 1;
 	std::vector<bool> percorridos(numVertices, false); // vetor de percorridos para evitar ciclos
 
 	Cabo* aux = new Cabo(-1, idFinal, 0); // cabo auxiliar so para iniciar o processo
+	estagiosCaminho estagios;
+	estagios.prox = aux;
+	estagios.conexHist = conexPais;
 
-	fila.push(aux);
+	fila.push(estagios);
 
 	while (!fila.empty()) { // enquanto houver caminho na fila
 
-		aux = fila.front();
+		aux = fila.front().prox;
+		std::vector<Cabo*> conexHist = fila.front().conexHist;
 		Vertice* atual = this->retVertice(aux->retIdDestino()); // pega o proximo vertice a ser percorrido
 		std::cout << "Atual: " << atual->retId() << std::endl;
 		fila.pop();
 
 		if (!atual->eGerador() && atual->retId() != idFinal) { // se o atual nao for gerador nem o destino
-			conexPais[atual->retId() - 1] = aux;
+			conexHist[atual->retId() - 1] = aux;
 		}
 		percorridos[atual->retId() - 1] = true; // atual foi percorrido
 
@@ -275,14 +286,30 @@ void Grafo::bfs(Vertice* inicio, Vertice fim, std::vector<Cabo*>& conexPais) {
 			if (*destino == fim && atual->retDeficit() != 0) { // se o proximo for o ponto ficticio final e o atual puder receber energia
 
 				std::cout << "Destino ficticio" << std::endl;
+				conexPais = conexHist;
 				conexPais[destino->retId() - 1] = cabo; // adiciona o cabo como ancestral do destino
 				return;
 			}
 
 			if ((!percorridos[destino->retId() - 1] && !cabo->lotado()) || atual->retDemanda() == -1) { // (se o proximo nao for percorrido e o cabo nao estiver lotado) ou atual for ficticio
+				
+				if (cabo->eInverso()) { // se for uma aresta de retorno
+					Vertice* inicial = this->retVertice(cabo->retIdDestino()); // pega o vertice de inicio (desinvertido)
+					Cabo* desinvertido = inicial->retCabo(cabo->retIdOrigem()); // pega a mesma aresta desinvertida
 
-				std::cout << "Proximo vertice" << std::endl;
-				fila.push(cabo); // adiciona o cabo na fila de execucao
+					if (desinvertido->retCorrente() > 0) { // se houver corrente
+						std::cout << "Proximo vertice" << std::endl;
+						estagios.prox = cabo;
+						estagios.conexHist = conexHist;
+						fila.push(estagios); // adiciona o cabo na fila de execucao
+					}
+				}
+				else {
+					std::cout << "Proximo vertice" << std::endl;
+					estagios.prox = cabo;
+					estagios.conexHist = conexHist;
+					fila.push(estagios); // adiciona o cabo na fila de execucao
+				}
 			}
 		}
 	}
@@ -358,6 +385,7 @@ void Grafo::edmonsKarp() {
 			Vertice* destino = fim;
 			Cabo* cabo = conexPais[destino->retId() - 1];
 			Vertice* origem = this->retVertice(cabo->retIdOrigem());
+			Cabo* desinvertido = nullptr;
 			gargalo = origem->retDeficit();
 
 			std::cout << "Ultimo vertice: " << origem->retId() << std::endl;
@@ -367,7 +395,15 @@ void Grafo::edmonsKarp() {
 
 				destino = origem;
 				cabo = conexPais[destino->retId() - 1];
-				origem = this->retVertice(cabo->retIdOrigem());
+
+				if (cabo->eInverso()) {
+					std::cout << "Cabo invertido" << std::endl;
+					origem = this->retVertice(cabo->retIdDestino());
+					desinvertido = origem->retCabo(cabo->retIdOrigem());
+				}
+				else {
+					origem = this->retVertice(cabo->retIdOrigem());
+				}
 
 				std::cout << "Origem: " << origem->retId() << std::endl;
 				std::cout << "Destino: " << destino->retId() << std::endl;
@@ -376,15 +412,30 @@ void Grafo::edmonsKarp() {
 
 				std::cout << "Cabo: " << cabo->retIdOrigem() << " -> " << cabo->retIdDestino() << ": " << cabo->retCorrente() << "/" << cabo->retCap() << std::endl;
 
-				if (cabo->ret_capDisponivel() < gargalo) { // acha o gargalo
-					gargalo = cabo->ret_capDisponivel();
+				if(!cabo->eInverso()){
+					if (cabo->ret_capDisponivel() < gargalo) { // acha o gargalo
+						gargalo = cabo->ret_capDisponivel();
+					}
+				}
+				else {
+					if (desinvertido->retCorrente() < gargalo) {
+						gargalo = desinvertido->retCorrente();
+					}
 				}
 			}
 
 			while (!caminho.empty()) {
 				cabo = caminho.top();
 				caminho.pop();
-				cabo->adCorrente(gargalo);
+				if (cabo->eInverso()) {
+					Vertice* inicial = this->retVertice(cabo->retIdDestino());
+					desinvertido = inicial->retCabo(cabo->retIdOrigem());
+					desinvertido->adCorrente(-(gargalo));
+				}
+				else {
+					cabo->adCorrente(gargalo);
+				}
+
 				std::cout << "Cabo: " << cabo->retIdOrigem() << " -> " << cabo->retIdDestino() << ": " << cabo->retCorrente() << "/" << cabo->retCap() << std::endl;
 				if (caminho.size() == 0) {
 					std::cout << "Id do ultimo: " << this->retVertice(cabo->retIdDestino())->retId() << std::endl;

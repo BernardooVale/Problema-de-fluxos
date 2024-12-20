@@ -48,9 +48,7 @@ void manual() {
     redeEletrica.normalizaInicio();
     redeEletrica.normalizaFim();
 
-    cout << endl;
-
-    redeEletrica.preencheRede();
+    redeEletrica.edmonsKarp();
     redeEletrica.removeInicioFim();
 
     int eTotal = redeEletrica.energiaTotal();
@@ -59,6 +57,33 @@ void manual() {
     std::cout << "Deficit total: " << redeEletrica.deficit() << std::endl;
     std::cout << "Excesso total: " << redeEletrica.excesso(eTotal) << std::endl;
     redeEletrica.cabosCriticos();
+
+    std::cout << std::endl;
+
+    cout << endl << "Ford-Fulkerson:" << endl << endl;
+
+    redeEletrica.adVertice(inicio);
+    redeEletrica.adVertice(fim);
+
+    // O algoritimo vai comecar do ponto inicio, que possui conexoes para todos os geradores, e tem como destino o ponto final que recebe uma aresta de todos os consumidores.
+    // Isso é feito para rodar uma vez apenas o algoritimo, ao inves de rodar ele a partir de todos os geradores para todos os consumidores
+
+    redeEletrica.normalizaInicio();
+    redeEletrica.normalizaFim();
+
+    redeEletrica.preencheRede();
+    redeEletrica.removeInicioFim();
+
+    eTotal = redeEletrica.energiaTotal();
+
+    std::cout << "Energia total: " << eTotal << std::endl;
+    std::cout << "Deficit total: " << redeEletrica.deficit() << std::endl;
+    std::cout << "Excesso total: " << redeEletrica.excesso(eTotal) << std::endl;
+    redeEletrica.cabosCriticos();
+
+    std::cout << std::endl;
+
+    redeEletrica.print();
 }
 
 void automatico() {
@@ -84,8 +109,10 @@ void automatico() {
     for (int i = 0; i < cabos; i++) {
         arquivo >> origem >> destino >> cap;
         Cabo cabo(origem, destino, cap);
-
         redeEletrica.retVertice(origem)->adCabo(cabo);
+
+        Cabo caboRetorno(destino, origem, cap, true);
+        redeEletrica.retVertice(destino)->adCabo(caboRetorno);
     }
 
     arquivo.close();
