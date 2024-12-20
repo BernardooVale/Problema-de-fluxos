@@ -19,22 +19,21 @@ public:
 	Grafo();
 
 	void adVertice(Vertice novo);
-	Vertice* retVertice(int id);
-	int energiaTotal();
-	int deficit();
-	int excesso(int eTotal);
 	void cabosCriticos();
 	void print();
 	void normalizaInicio(); // adiciona um cabo entre o ponto ficticio de inicio ate todos os geradores
 	void normalizaFim(); // adiciona um cabo entre todos os consumidores e o ponto ficticio de fim
 	void removeInicioFim(); // remove os pontos de inicio e fim para nao interferir no calculo
+	void bfs(Vertice* atual, Vertice fim, vector<Cabo*>& conexPais);
+	void edmonsKarp();
+
+	int energiaTotal();
+	int deficit();
+	int excesso(int eTotal);
 	int retPos(Vertice atual);
 	int retTam();
-	void preencheRede();
-	void dfs(Vertice* atual, Vertice* fim, vector<Cabo*> caminho, vector<bool> percorridos);
-	void bfs(Vertice* atual, Vertice fim, vector<Cabo*>& conexPais);
-	void fordFulk(vector<Cabo*> caminho);
-	void edmonsKarp();
+
+	Vertice* retVertice(int id);
 };
 
 #endif

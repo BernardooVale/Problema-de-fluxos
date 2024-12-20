@@ -41,36 +41,7 @@ void Vertice::removeCabo(int id) {
 	}
 }
 
-int Vertice::grauVertice() { return (int)this->cabos.size(); }
-bool Vertice::eGerador() { return this->gerador; }
-int Vertice::retId() { return this->id; }
-int Vertice::retConsumo() { return this->consumo; }
-int Vertice::retDeficit() { return (this->demanda - this->consumo); }
-void Vertice::def_energiaLivre() { this->energiaLivre += this->consumo - this->demanda; }
-int Vertice::ret_energiaLivre() { return this->energiaLivre; }
-void Vertice::remove_energiaLivre(int quant) { this->energiaLivre -= quant; }
-bool Vertice::operator==(const Vertice& other) const { return (this->id == other.id); }
-int Vertice::retDemanda() { return this->demanda; }
-void Vertice::def_energiaLivre(int valor) { this->energiaLivre = valor; }
-
-void Vertice::normalizaConsumo() {
-	if (this->consumo > this->demanda) {
-		this->def_energiaLivre();
-		this->consumo = this->demanda;
-	}
-}
-
-void Vertice::defConsumo(int consumo) {
-	this->consumo = consumo;
-	this->normalizaConsumo();
-}
-
-void Vertice::adConsumo(int consumo) {
-	this->consumo += consumo;
-	this->normalizaConsumo();
-}
-
-int Vertice::energiaTotal() { return this->consumo; }
+void Vertice::adConsumo(int consumo) { this->consumo += consumo; }
 
 void Vertice::cabosCriticos(std::vector<Cabo>& cabosCriticos) {
 
@@ -95,6 +66,13 @@ void Vertice::print() {
 	//}
 }
 
+int Vertice::grauVertice() { return (int)this->cabos.size(); }
+int Vertice::retId() { return this->id; }
+int Vertice::retConsumo() { return this->consumo; }
+int Vertice::retDeficit() { return (this->demanda - this->consumo); }
+int Vertice::retDemanda() { return this->demanda; }
+int Vertice::energiaTotal() { return this->consumo; }
+
 int Vertice::capSaida() {
 
 	int total = 0;
@@ -107,3 +85,6 @@ int Vertice::capSaida() {
 
 	return total;
 }
+
+bool Vertice::eGerador() { return this->gerador; }
+bool Vertice::operator==(const Vertice& other) const { return (this->id == other.id); }

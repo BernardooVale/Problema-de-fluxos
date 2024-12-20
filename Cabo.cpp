@@ -20,27 +20,16 @@ Cabo::Cabo(int idOrigem, int idDestino, int cap) {
 	this->inverso = false;
 }
 
-void Cabo::normalizaCorrente() {
-	if (this->corrente > this->cap) {
-		this->corrente = this->cap;
-	}
-}
 
-void Cabo::defCorrente(int corrente) {
-	this->corrente = corrente;
-	this->normalizaCorrente();
-}
-void Cabo::adCorrente(int corrente) {
-	this->corrente += corrente;
-	this->normalizaCorrente();
-}
+void Cabo::adCorrente(int corrente) { this->corrente += corrente; }
 
 int Cabo::retCorrente() { return this->corrente; }
 int Cabo::retIdDestino() { return this->idDestino; }
-bool Cabo::lotado() { return (this->corrente == this->cap ? true : false); }
 int Cabo::retCap() { return this->cap; }
 int Cabo::ret_capDisponivel() { return this->cap - this->corrente; }
 int Cabo::retIdOrigem() { return this->idOrigem; }
+
+bool Cabo::lotado() { return (this->corrente == this->cap ? true : false); }
 bool Cabo::eInverso() { return this->inverso; }
 
 void Cabo::print() {

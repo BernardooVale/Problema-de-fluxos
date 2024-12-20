@@ -60,29 +60,6 @@ void manual() {
 
     std::cout << std::endl;
 
-    cout << endl << "Ford-Fulkerson:" << endl << endl;
-
-    redeEletrica.adVertice(inicio);
-    redeEletrica.adVertice(fim);
-
-    // O algoritimo vai comecar do ponto inicio, que possui conexoes para todos os geradores, e tem como destino o ponto final que recebe uma aresta de todos os consumidores.
-    // Isso é feito para rodar uma vez apenas o algoritimo, ao inves de rodar ele a partir de todos os geradores para todos os consumidores
-
-    redeEletrica.normalizaInicio();
-    redeEletrica.normalizaFim();
-
-    redeEletrica.preencheRede();
-    redeEletrica.removeInicioFim();
-
-    eTotal = redeEletrica.energiaTotal();
-
-    std::cout << "Energia total: " << eTotal << std::endl;
-    std::cout << "Deficit total: " << redeEletrica.deficit() << std::endl;
-    std::cout << "Excesso total: " << redeEletrica.excesso(eTotal) << std::endl;
-    redeEletrica.cabosCriticos();
-
-    std::cout << std::endl;
-
     redeEletrica.print();
 }
 
@@ -138,29 +115,6 @@ void automatico() {
     redeEletrica.removeInicioFim();
 
     int eTotal = redeEletrica.energiaTotal();
-
-    std::cout << "Energia total: " << eTotal << std::endl;
-    std::cout << "Deficit total: " << redeEletrica.deficit() << std::endl;
-    std::cout << "Excesso total: " << redeEletrica.excesso(eTotal) << std::endl;
-    redeEletrica.cabosCriticos();
-
-    std::cout << std::endl;
-
-    cout << endl << "Ford-Fulkerson:" << endl << endl;
-
-    redeEletrica.adVertice(inicio);
-    redeEletrica.adVertice(fim);
-
-    // O algoritimo vai comecar do ponto inicio, que possui conexoes para todos os geradores, e tem como destino o ponto final que recebe uma aresta de todos os consumidores.
-    // Isso é feito para rodar uma vez apenas o algoritimo, ao inves de rodar ele a partir de todos os geradores para todos os consumidores
-
-    redeEletrica.normalizaInicio();
-    redeEletrica.normalizaFim();
-
-    redeEletrica.preencheRede();
-    redeEletrica.removeInicioFim();
-
-    eTotal = redeEletrica.energiaTotal();
 
     std::cout << "Energia total: " << eTotal << std::endl;
     std::cout << "Deficit total: " << redeEletrica.deficit() << std::endl;
