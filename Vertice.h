@@ -6,7 +6,7 @@
 
 using namespace std;
 
-class Vertice{
+class Vertice {
 
 private:
 
@@ -39,6 +39,7 @@ public:
 	int retDemanda();
 	void def_energiaLivre(int valor);
 	Cabo* retCabo_pos(int pos);
+	int capSaida();
 };
 
 #endif

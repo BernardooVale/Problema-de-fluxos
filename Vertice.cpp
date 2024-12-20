@@ -13,9 +13,13 @@ Vertice::Vertice(int id, int demanda) {
 
 Cabo* Vertice::retCabo(int destino) {
 
-	for (int i = 0; i < this->cabos.size(); i++)
-		if (this->cabos[i].retIdDestino() == destino)
-			return &this->cabos[i];
+	for (auto& cabo : this->cabos)
+		if (cabo.retIdDestino() == destino)
+			return &cabo;
+
+	//for (int i = 0; i < this->cabos.size(); i++)
+	//	if (this->cabos[i].retIdDestino() == destino)
+	//		return &this->cabos[i];
 
 	return nullptr;
 }
@@ -24,20 +28,20 @@ Cabo* Vertice::retCabo_pos(int pos) { return &this->cabos[pos]; }
 
 void Vertice::adCabo(Cabo novo) {
 
-	if(this->retCabo(novo.retIdDestino()) == nullptr)
+	if (this->retCabo(novo.retIdDestino()) == nullptr)
 		this->cabos.push_back(novo);
 }
 
 void Vertice::removeCabo(int id) {
 
-	for (int i = 0; i < this->cabos.size(); i++) {
+	for (size_t i = 0; i < this->cabos.size(); i++) {
 		if (this->cabos[i].retIdDestino() == id) {
-			this->cabos.erase(this->cabos.begin() + i);
+			this->cabos.erase(this->cabos.begin() + (int)i);
 		}
 	}
 }
 
-int Vertice::grauVertice() { return this->cabos.size(); }
+int Vertice::grauVertice() { return (int)this->cabos.size(); }
 bool Vertice::eGerador() { return this->gerador; }
 int Vertice::retId() { return this->id; }
 int Vertice::retConsumo() { return this->consumo; }
@@ -70,16 +74,36 @@ int Vertice::energiaTotal() { return this->consumo; }
 
 void Vertice::cabosCriticos(std::vector<Cabo>& cabosCriticos) {
 
-	for (int i = 0; i < this->cabos.size(); i++)
-		if (this->cabos[i].lotado())
-			cabosCriticos.push_back(this->cabos[i]);
+	for (auto& cabo : this->cabos)
+		if (cabo.lotado())
+			cabosCriticos.push_back(cabo);
+
+	//for (int i = 0; i < this->cabos.size(); i++)
+	//	if (this->cabos[i].lotado())
+	//		cabosCriticos.push_back(this->cabos[i]);
 }
 
 void Vertice::print() {
 
 	std::cout << "Vertice " << this->id << ": " << this->consumo << "/" << this->demanda << std::endl;
 
-	for (int i = 0; i < this->cabos.size(); i++) {
-		this->cabos[i].print();
-	}
+	for (auto& cabo : this->cabos)
+		cabo.print();
+
+	//for (int i = 0; i < this->cabos.size(); i++) {
+	//	this->cabos[i].print();
+	//}
+}
+
+int Vertice::capSaida() {
+
+	int total = 0;
+
+	for (auto& cabo : this->cabos)
+		total += cabo.retCap();
+
+	//for (size_t i = 0; i < this->cabos.size(); i++)
+	//	total += this->cabos[i].retCap();
+
+	return total;
 }

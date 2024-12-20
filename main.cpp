@@ -53,9 +53,11 @@ void manual() {
     redeEletrica.preencheRede();
     redeEletrica.removeInicioFim();
 
-    std::cout << "Energia total: " << redeEletrica.energiaTotal() << std::endl;
+    int eTotal = redeEletrica.energiaTotal();
+
+    std::cout << "Energia total: " << eTotal << std::endl;
     std::cout << "Deficit total: " << redeEletrica.deficit() << std::endl;
-    std::cout << "Excesso total: " << redeEletrica.excesso() << std::endl;
+    std::cout << "Excesso total: " << redeEletrica.excesso(eTotal) << std::endl;
     redeEletrica.cabosCriticos();
 }
 
@@ -88,6 +90,12 @@ void automatico() {
 
     arquivo.close();
 
+    cout << endl;
+
+    //redeEletrica.preencheRede();
+
+    cout << endl << "Edmonds-Karp:" << endl;
+
     Vertice inicio(redeEletrica.retTam() + 1, -1); // Ponto ficticio de inicio
     redeEletrica.adVertice(inicio);
     Vertice fim(redeEletrica.retTam() + 1, -1); // Ponto ficticio de final
@@ -99,14 +107,37 @@ void automatico() {
     redeEletrica.normalizaInicio();
     redeEletrica.normalizaFim();
 
-    cout << endl;
+    redeEletrica.edmonsKarp();
+    redeEletrica.removeInicioFim();
+
+    int eTotal = redeEletrica.energiaTotal();
+
+    std::cout << "Energia total: " << eTotal << std::endl;
+    std::cout << "Deficit total: " << redeEletrica.deficit() << std::endl;
+    std::cout << "Excesso total: " << redeEletrica.excesso(eTotal) << std::endl;
+    redeEletrica.cabosCriticos();
+
+    std::cout << std::endl;
+
+    cout << endl << "Ford-Fulkerson:" << endl << endl;
+
+    redeEletrica.adVertice(inicio);
+    redeEletrica.adVertice(fim);
+
+    // O algoritimo vai comecar do ponto inicio, que possui conexoes para todos os geradores, e tem como destino o ponto final que recebe uma aresta de todos os consumidores.
+    // Isso é feito para rodar uma vez apenas o algoritimo, ao inves de rodar ele a partir de todos os geradores para todos os consumidores
+
+    redeEletrica.normalizaInicio();
+    redeEletrica.normalizaFim();
 
     redeEletrica.preencheRede();
     redeEletrica.removeInicioFim();
 
-    std::cout << "Energia total: " << redeEletrica.energiaTotal() << std::endl;
+    eTotal = redeEletrica.energiaTotal();
+
+    std::cout << "Energia total: " << eTotal << std::endl;
     std::cout << "Deficit total: " << redeEletrica.deficit() << std::endl;
-    std::cout << "Excesso total: " << redeEletrica.excesso() << std::endl;
+    std::cout << "Excesso total: " << redeEletrica.excesso(eTotal) << std::endl;
     redeEletrica.cabosCriticos();
 
     std::cout << std::endl;
@@ -114,7 +145,7 @@ void automatico() {
     redeEletrica.print();
 }
 
-int main(){
+int main() {
 
     int teste;
 

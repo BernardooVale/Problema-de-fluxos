@@ -8,7 +8,7 @@
 
 using namespace std;
 
-class Grafo{
+class Grafo {
 
 private:
 
@@ -22,7 +22,7 @@ public:
 	Vertice* retVertice(int id);
 	int energiaTotal();
 	int deficit();
-	int excesso();
+	int excesso(int eTotal);
 	void cabosCriticos();
 	void print();
 	void normalizaInicio(); // adiciona um cabo entre o ponto ficticio de inicio ate todos os geradores
@@ -32,7 +32,9 @@ public:
 	int retTam();
 	void preencheRede();
 	void dfs(Vertice* atual, Vertice* fim, vector<Cabo*> caminho, vector<bool> percorridos);
+	void bfs(Vertice* atual, Vertice fim, vector<Cabo*>& conexPais);
 	void fordFulk(vector<Cabo*> caminho);
+	void edmonsKarp();
 };
 
 #endif

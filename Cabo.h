@@ -1,6 +1,6 @@
 #ifndef Cabo_HPP
 #define Cabo_HPP
-class Cabo{
+class Cabo {
 
 private:
 
