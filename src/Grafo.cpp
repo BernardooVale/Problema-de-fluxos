@@ -9,7 +9,7 @@
 
 Grafo::Grafo() {}
 
-Vertice* Grafo::retVertice(int id) {
+Vertice* Grafo::retVertice(int id) {	// retorna o vertice cujo id ==id
 
 	for (auto& vertice : this->vertices)
 		if (vertice.retId() == id)
@@ -24,16 +24,16 @@ Vertice* Grafo::retVertice(int id) {
 	//return nullptr;
 }
 
-void Grafo::adVertice(Vertice novo) {
+void Grafo::adVertice(Vertice novo) {	// adiciona um vertice
 
 	if (this->retVertice(novo.retId()) == nullptr) {
 		this->vertices.push_back(novo);
 	}
 }
 
-bool comp(Cabo x, Cabo y) { return x.retCap() > y.retCap(); }
+bool comp(Cabo x, Cabo y) { return x.retCap() > y.retCap(); }	// funcao interna para std::sort
 
-void Grafo::cabosCriticos() {
+void Grafo::cabosCriticos() {	// pega todos os cabos criticos
 
 	std::vector<Cabo> cabosCriticos;
 
@@ -63,7 +63,7 @@ void Grafo::print() {
 	//	this->vertices[i].print();
 }
 
-void Grafo::normalizaInicio() {
+void Grafo::normalizaInicio() {	// adiciona um cabo entre o ponto ficticio de inicio ate todos os geradores
 
 	Vertice* inicio = this->retVertice(this->retTam() - 1);
 
@@ -92,7 +92,7 @@ void Grafo::normalizaFim() { // adiciona um cabo entre todos os consumidores e o
 
 }
 
-void Grafo::removeInicioFim() { // remove os vertices de apoio
+void Grafo::removeInicioFim() { // remove os vertices de apoio e as respectivas arestas
 
 	Vertice* inicio = this->retVertice(this->retTam() - 1);
 	Vertice* fim = this->retVertice(this->retTam());
@@ -107,7 +107,7 @@ void Grafo::removeInicioFim() { // remove os vertices de apoio
 	this->vertices.erase(find(this->vertices.begin(), this->vertices.end(), *fim)); // tira fim
 }
 
-int Grafo::retPos(Vertice atual) {
+int Grafo::retPos(Vertice atual) {	// retorna a posicao de Vertice atual dentro de this.vertices 
 
 	for (int i = 0; i < this->retTam(); i++)
 		if (atual == this->vertices[i])
@@ -116,22 +116,22 @@ int Grafo::retPos(Vertice atual) {
 	return -1;
 }
 
-int Grafo::retTam() { return (int)this->vertices.size(); }
+int Grafo::retTam() { return (int)this->vertices.size(); }	// retorna o tamanho do vertor de vertices
 
-int Grafo::energiaTotal() {
+int Grafo::energiaTotal() {	// calcula a energia dentro do sistema
 
 	int total = 0;
 
 	for (auto& vertice : this->vertices)
-		total += vertice.energiaTotal();
+		total += vertice.retConsumo();
 
 	//for (size_t i = 0; i < this->vertices.size(); i++)
-	//	total += this->vertices[i].energiaTotal();
+	//	total += this->vertices[i].retConsumo();
 
 	return total;
 }
 
-int Grafo::deficit() {
+int Grafo::deficit() {	// calcula o defict do sistema
 
 	int total = 0;
 
@@ -144,7 +144,7 @@ int Grafo::deficit() {
 	return total;
 }
 
-int Grafo::excesso(int eTotal) {
+int Grafo::excesso(int eTotal) {	// retorna o excesso do sistema
 
 	int total = 0;
 
@@ -159,22 +159,22 @@ int Grafo::excesso(int eTotal) {
 	return (total - eTotal);
 }
 
-struct estagiosCaminho {
+struct estagiosCaminho {	// estrutura para guardar o historico de cada passo da bfs
 	std::vector<Cabo*> conexHist;
-	Cabo* prox;
+	Cabo* prox = nullptr;
 };
 
 void Grafo::bfs(Vertice* inicio, Vertice fim, std::vector<Cabo*>& conexPais) {
 
 	std::queue<estagiosCaminho> fila; // fila de execucao
-	int numVertices = this->retTam();
-	int idFinal = numVertices - 1;
+	int numVertices = this->retTam(); 
+	int idFinal = numVertices - 1;	// 
 	std::vector<bool> percorridos(numVertices, false); // vetor de percorridos para evitar ciclos
 
 	Cabo* aux = new Cabo(-1, idFinal, 0); // cabo auxiliar so para iniciar o processo
-	estagiosCaminho estagios;
-	estagios.prox = aux;
-	estagios.conexHist = conexPais;
+	estagiosCaminho estagios;	// inicializando a struct
+	estagios.prox = aux;		// cabo do prox passo
+	estagios.conexHist = conexPais;	// historico
 
 	fila.push(estagios);
 
@@ -187,11 +187,11 @@ void Grafo::bfs(Vertice* inicio, Vertice fim, std::vector<Cabo*>& conexPais) {
 		fila.pop();
 
 		if (!atual->eGerador() && atual->retId() != idFinal) { // se o atual nao for gerador nem o destino
-			conexHist[atual->retId() - 1] = aux;
+			conexHist[atual->retId() - 1] = aux; // o ancestral de atual vai ser o cabo aux
 		}
 		percorridos[atual->retId() - 1] = true; // atual foi percorrido
 
-		for (size_t i = 0; i < atual->grauVertice(); i++) { // para todos as arestas
+		for (size_t i = 0; i < atual->grauVertice(); i++) { // para todos as arestas de atual
 
 			Cabo* cabo = atual->retCabo_pos((int)i); // proximo cabo
 
@@ -202,9 +202,9 @@ void Grafo::bfs(Vertice* inicio, Vertice fim, std::vector<Cabo*>& conexPais) {
 			if (*destino == fim && atual->retDeficit() != 0) { // se o proximo for o ponto ficticio final e o atual puder receber energia
 
 				std::cout << "Destino ficticio" << std::endl;
-				conexPais = conexHist;
+				conexPais = conexHist;	// retorna o historico daquele caminho especifico
 				conexPais[destino->retId() - 1] = cabo; // adiciona o cabo como ancestral do destino
-				return;
+				return; // caminho valido encontrado
 			}
 
 			if ((!percorridos[destino->retId() - 1] && !cabo->lotado()) || atual->retDemanda() == -1) { // (se o proximo nao for percorrido e o cabo nao estiver lotado) ou atual for ficticio
@@ -213,17 +213,17 @@ void Grafo::bfs(Vertice* inicio, Vertice fim, std::vector<Cabo*>& conexPais) {
 					Vertice* inicial = this->retVertice(cabo->retIdDestino()); // pega o vertice de inicio (desinvertido)
 					Cabo* desinvertido = inicial->retCabo(cabo->retIdOrigem()); // pega a mesma aresta desinvertida
 
-					if (desinvertido->retCorrente() > 0) { // se houver corrente
+					if (desinvertido->retCorrente() > 0) { // se houver corrente disponivel
 						std::cout << "Proximo vertice" << std::endl;
-						estagios.prox = cabo;
-						estagios.conexHist = conexHist;
+						estagios.prox = cabo; // adiciona o cabo no passo a ser adicionado na fila
+						estagios.conexHist = conexHist; // adiciona o historico ao passo
 						fila.push(estagios); // adiciona o cabo na fila de execucao
 					}
 				}
 				else {
 					std::cout << "Proximo vertice" << std::endl;
-					estagios.prox = cabo;
-					estagios.conexHist = conexHist;
+					estagios.prox = cabo;	// adiciona o cabo no passo a ser adicionado na fila
+					estagios.conexHist = conexHist;	// adiciona o historico ao passo
 					fila.push(estagios); // adiciona o cabo na fila de execucao
 				}
 			}
@@ -235,38 +235,41 @@ void Grafo::bfs(Vertice* inicio, Vertice fim, std::vector<Cabo*>& conexPais) {
 
 void Grafo::edmonsKarp() {
 
-	Vertice* inicio = &this->vertices[this->retTam() - 2];
-	Vertice* fim = &this->vertices[this->retTam() - 1];
+	Vertice* inicio = &this->vertices[this->retTam() - 2]; // vertice ficticio de inicio
+	Vertice* fim = &this->vertices[this->retTam() - 1];	// verticde ficticio de fim
 	int gargalo;
 
-	while(true){
-		std::vector<Cabo*> conexPais(this->retTam(), nullptr);
+	while(true){ // enquanto houverem caminhos validos (tem um break no final)
+
+		std::vector<Cabo*> conexPais(this->retTam(), nullptr); // caminho
 
 		this->bfs(inicio, *fim, conexPais); // pega o caminho
 
-		if(conexPais[fim->retId() - 1] != nullptr) {
+		if(conexPais[fim->retId() - 1] != nullptr) { // se o destino ficticio tiver ancestral (caminho valido)
 			std::stack<Cabo*> caminho;
 
+			// variaveis
 			Vertice* destino = fim;
 			Cabo* cabo = conexPais[destino->retId() - 1];
 			Vertice* origem = this->retVertice(cabo->retIdOrigem());
 			Cabo* desinvertido = nullptr;
-			gargalo = origem->retDeficit();
+
+			gargalo = origem->retDeficit(); // gargalo tem que ser menor ou igual ao quanto falta de energia para o vertice destino real
 
 			std::cout << "Ultimo vertice: " << origem->retId() << std::endl;
 			std::cout << "Energia que falta: " << origem->retDeficit() << std::endl;
 
 			while (conexPais[origem->retId() - 1] != nullptr) { // enquanto nao chegar no primeiro
 
-				destino = origem;
-				cabo = conexPais[destino->retId() - 1];
+				destino = origem; // passo anterior
+				cabo = conexPais[destino->retId() - 1]; // cabo ancestral anterior
 
-				if (cabo->eInverso()) {
-					std::cout << "Cabo invertido" << std::endl;
+				if (cabo->eInverso()) { // se ele for inverso
+					std::cout << std::endl << "Cabo invertido" << std::endl << std::endl;
 					origem = this->retVertice(cabo->retIdDestino());
 					desinvertido = origem->retCabo(cabo->retIdOrigem());
 				}
-				else {
+				else { // se ele nao for inverso
 					origem = this->retVertice(cabo->retIdOrigem());
 				}
 
@@ -277,38 +280,41 @@ void Grafo::edmonsKarp() {
 
 				std::cout << "Cabo: " << cabo->retIdOrigem() << " -> " << cabo->retIdDestino() << ": " << cabo->retCorrente() << "/" << cabo->retCap() << std::endl;
 
+				// acha o gargalo
 				if(!cabo->eInverso()){
-					if (cabo->ret_capDisponivel() < gargalo) { // acha o gargalo
-						gargalo = cabo->ret_capDisponivel();
+					if (cabo->ret_capDisponivel() < gargalo) { // se nao for inverso, considera a capacidade disponivel do cabo 
+						gargalo = cabo->ret_capDisponivel(); 
 					}
 				}
 				else {
-					if (desinvertido->retCorrente() < gargalo) {
+					if (desinvertido->retCorrente() < gargalo) { // se for inverso, considera a corrente do cabo desinvertido
 						gargalo = desinvertido->retCorrente();
 					}
 				}
 			}
 
-			while (!caminho.empty()) {
+			while (!caminho.empty()) { // enquanto tiver caminho
+
 				cabo = caminho.top();
 				caminho.pop();
-				if (cabo->eInverso()) {
+
+				if (cabo->eInverso()) { // se for invertido
 					Vertice* inicial = this->retVertice(cabo->retIdDestino());
 					desinvertido = inicial->retCabo(cabo->retIdOrigem());
-					desinvertido->adCorrente(-(gargalo));
+					desinvertido->adCorrente(-(gargalo)); // tira o equivalente ao gargalo da corrente do cabo desinvertido
 				}
-				else {
-					cabo->adCorrente(gargalo);
+				else { // se nao for invertido
+					cabo->adCorrente(gargalo); // adiciona o equivalente ao gargalo na corrente 
 				}
 
 				std::cout << "Cabo: " << cabo->retIdOrigem() << " -> " << cabo->retIdDestino() << ": " << cabo->retCorrente() << "/" << cabo->retCap() << std::endl;
-				if (caminho.size() == 0) {
+				if (caminho.size() == 0) { // quando chegar no ultimo
 					std::cout << "Id do ultimo: " << this->retVertice(cabo->retIdDestino())->retId() << std::endl;
-					this->retVertice(cabo->retIdDestino())->adConsumo(gargalo);
+					this->retVertice(cabo->retIdDestino())->adConsumo(gargalo); // adiciona ao vertice a energia equivalente ao gargalo
 				}
 			}
 		}
-		if (conexPais[fim->retId() - 1] == nullptr) {
+		if (conexPais[fim->retId() - 1] == nullptr) { // quando o destino nao tiver ancestral (nao ha caminho valido) para
 			break;
 		}
 	}

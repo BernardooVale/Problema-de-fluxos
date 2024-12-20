@@ -1,33 +1,27 @@
-# Nome do executável
-EXEC = tp2
+# Definindo variáveis
+CXX = g++                        # Compilador C++
+CXXFLAGS = -Wall -Wextra -Wpedantic -Wformat-security -Wconversion -Werror # Flags de compilação
+SRC_DIR = src                      # Diretório onde estão os arquivos fonte
+OBJ_DIR = obj                      # Diretório onde os arquivos objeto serão armazenados
+TARGET = tp2                       # Nome do executável
 
-# Compilador e flags
-CXX = g++
-CXXFLAGS = -Wall -Wextra -Wpedantic -Wformat-security -Wconversion -Werror
+SRC= $(wildcard $(SRC_DIR)/*.cpp)
 
-# Arquivos fonte
-SRCS = main.cpp Cabo.cpp Vertice.cpp Grafo.cpp
+HEADERS = $(wildcard $(SRC_DIR)/*.h)
 
-# Arquivos de cabeçalho
-HEADERS = Cabo.h Vertice.h Grafo.h
+# Gerando os arquivos objeto correspondentes
+OBJS = $(SRCS:$(SRC_DIR)/%.cpp=$(OBJ_DIR)/%.o)
 
-# Objetos gerados a partir dos arquivos fonte
-OBJS = $(SRCS:.cpp=.o)
+all: $(TARGET)
 
-# Regra padrão (para compilar o executável)
-all: $(EXEC)
+$(TARGET): $(OBJS) 
+		$(CC) $(OBJS) -o $(TARGET)
 
-# Regra para criar o executável
-$(EXEC): $(OBJS)
-	$(CXX) $(OBJS) -o $(EXEC)
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
+		@mkdir -p $(OBJ_DIR)
+		$(CC) $(CXXFLAGS) -c $< -O $@
 
-# Como compilar os arquivos .cpp para .o
-%.o: %.cpp $(HEADERS)
-	$(CXX) $(CXXFLAGS) -c $< -o $@
-
-# Limpeza de arquivos gerados
 clean:
-	rm -f $(OBJS) $(EXEC)
+		rm -rf $(OBJ_DIR) $(TARGET)
 
-# Regras para recomeçar do zero
-re: clean all
+.PHONY all clean

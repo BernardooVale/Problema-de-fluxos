@@ -14,14 +14,14 @@ public:
 
 	void adCorrente(int corrente); // adiciona ao valor atual da corrente
 
-	int retCorrente(); // retorna corrente
-	int retIdDestino(); // retorna id destino
-	int retCap();
-	int ret_capDisponivel();
-	int retIdOrigem();
+	int retCorrente();			// retorna corrente
+	int retIdDestino();			// retorna id destino
+	int retCap();				// retorna a capacidade
+	int ret_capDisponivel();	// retorna cap - corrente
+	int retIdOrigem();			// retorna id origem
 
-	bool lotado(); // retorna se a corrente == cap
-	bool eInverso();
+	bool lotado();				// retorna corrente == cap ?
+	bool eInverso();			// retorna inverso ?
 
 	void print();
 };
